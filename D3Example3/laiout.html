@@ -1,0 +1,179 @@
+<script src="https://d3js.org/d3.v5.min.js"></script>
+<svg id="area"></svg>
+<style>
+  .area {fill:white; stroke: black;}
+  .grid line {fill:none; stroke: gray; stroke-width:1;}
+</style>
+<body>
+  <div id="grid"></div>
+</body>
+<script>
+
+  var data = [
+    { 
+      x: 0, 
+      y: 0 
+    },
+    //vindu
+    { 
+      x: 19, 
+      y: 0 
+    },
+    {
+      x: 19,
+      y: -1
+    },
+    {
+      x: 14,
+      y: -1
+    },
+    {
+      x: 14,
+      y: 0
+    },
+    //vindu
+    { 
+      x: 13, 
+      y: 0 
+    },
+    {
+      x: 13,
+      y: -1
+    },
+    {
+      x: 8,
+      y: -1
+    },
+    {
+      x: 8,
+      y: 0
+    },
+    //vindu
+    { 
+      x: 7, 
+      y: 0 
+    },
+    {
+      x: 7,
+      y: -1
+    },
+    {
+      x: 2,
+      y: -1
+    },
+    {
+      x: 2,
+      y: 0
+    },
+
+    {
+      x: 22, 
+      y: 0  
+    },
+    {
+      x: 22,
+      y: 40
+    },
+    {
+      x: 22,
+      y: 40
+    },
+    {
+      x: 22,
+      y: 45
+    },
+    {
+      x: 10,
+      y: 45
+    },
+    {
+      x: 10,
+      y: 33
+    },
+    {
+      x: 8,
+      y: 33
+    },
+    {
+      x: 8,
+      y: 40
+    },
+    //dør
+    {
+      x: 0,
+      y: 40
+    },
+    {
+      x: 0,
+      y: 20
+    },
+    {
+      x: 0.5,
+      y: 20
+    },
+    {
+      x: 0.5,
+      y: 10
+    },
+    {
+      x: 0,
+      y: 10
+    },
+    {
+      x: 0,
+      y: 20
+    },
+];
+
+var margin = {top: 20, right: 20, bottom: 30, left: 30},
+    width = 400 - margin.left - margin.right,
+    height = 350 - margin.top - margin.bottom;
+
+var x = d3.scaleLinear()
+    .domain([0, d3.max(data, function(d) { return d.x; })])
+    .range([0, width]);
+
+var y = d3.scaleLinear()
+    .domain([0, d3.max(data, function(d) { return d.y; })])
+    .range([height, 0]);
+
+var xAxis = d3.axisBottom()
+    .scale(x);
+
+var yAxis = d3.axisLeft()
+    .scale(y);
+
+var area = d3.area()
+    .x(function(d) { return x(d.x); })
+    .y0(height)
+    .y1(function(d) { return y(d.y); });
+
+var svg = d3.select("svg#area")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+svg.append("path")
+    .datum(data)
+    .attr("class", "area")
+    .attr("d", area);
+
+svg.append("clipPath")
+   .attr("id", "area-clip")
+   .append("path")
+   .attr("d", area(data)); 
+
+
+var grid = svg.append("g")
+    .attr("clip-path","url(#area-clip)");
+    
+grid.append("g")
+    .attr("class", "grid")
+    .attr("transform", "translate(0," + height + ")")
+    .call(xAxis.tickSize(-height).tickFormat(""));
+grid.append("g")
+    .attr("class", "grid")
+    .call(yAxis.tickSize(-width).tickFormat(""));
+
+</script>
