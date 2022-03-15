@@ -267,42 +267,57 @@
   function placeDesk(xPos = 0, yPos = 95, rotation = 0) {
     var desk = svg.append("g");
 
+    // Dimensions
+    var deskAreaHeight = 70,
+      deskAreaWidth = 70,
+      tableWidth = deskAreaWidth,
+      tableHeight = deskAreaHeight / 2,
+      chairWidth = 25,
+      chairHeight = chairWidth;
+
     // Desk area
-    desk
+    var deskArea = desk
       .append("rect")
-      .attr("clip-path", "url(#area-clip)")
-      .attr("x", xPos)
-      .attr("y", yPos)
-      .attr("width", 70)
-      .attr("height", 70)
-      .attr("class", "desk-area")
-      .attr("transform", "translate(0," + -60 + ")");
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("width", deskAreaWidth)
+      .attr("height", deskAreaHeight)
+      .attr("class", "desk-area");
 
     // Chair
-    desk
+    var chair = desk
       .append("rect")
-      .attr("clip-path", "url(#area-clip)")
-      .attr("x", xPos + 20)
-      .attr("y", yPos + 15)
-      .attr("width", 25)
-      .attr("height", 25)
-      .attr("class", "desk")
-      .attr("transform", "translate(0," + -60 + ")");
+      .attr("x", 20)
+      .attr("y", 15)
+      .attr("width", chairWidth)
+      .attr("height", chairHeight)
+      .attr("class", "desk");
 
-    // Desk
-    desk
+    // Table
+    var table = desk
       .append("rect")
-      .attr("clip-path", "url(#area-clip)")
-      .attr("x", xPos)
-      .attr("y", yPos + 40)
-      .attr("width", 70)
-      .attr("height", 30)
-      .attr("class", "desk")
-      .attr("transform", "translate(0," + -60 + ")");
+      .attr("x", 0)
+      .attr("y", 40)
+      .attr("width", tableWidth)
+      .attr("height", tableHeight)
+      .attr("class", "desk");
 
     // Group attributes
-    desk.attr("transform", "rotate(" + rotation + ")");
+    desk.attr(
+      "transform",
+      "translate(" +
+        xPos +
+        ", " +
+        yPos +
+        ") rotate(" +
+        rotation +
+        ", " +
+        deskAreaWidth / 2 +
+        "," +
+        deskAreaHeight / 2 +
+        ")"
+    );
   }
 
-  placeDesk(0, 95, 10);
+  placeDesk(0, 0, 0);
 </script>
