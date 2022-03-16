@@ -54,8 +54,11 @@
   }
 </style>
 <body>
-  <div id="grid"></div>
+  <div id="grid" style="margin-bottom: 60px"></div>
+  <button>Mark front of desks</button>
+  <button>Toggle room area</button>
 </body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
   var windows = [
     //vindu
@@ -202,6 +205,7 @@
   ];
 
   var markDeskFront = true;
+  var showRoomArea = false;
 
   var margin = { top: 20, right: 20, bottom: 30, left: 30 },
     width = 400 - margin.left - margin.right,
@@ -256,6 +260,14 @@
 
   // Doors
   svg.append("path").datum(doors).attr("class", "area").attr("d", area);
+
+  // Room area
+  if (showRoomArea)
+    svg
+      .append("path")
+      .attr("d", area(outerWall))
+      .attr("fill", "rgb(134 239 172)")
+      .attr("id", "room");
 
   svg
     .append("clipPath")
@@ -328,21 +340,26 @@
     }
 
     // Group attributes
-    desk.attr(
-      "transform",
-      "translate(" +
-        xPos +
-        ", " +
-        yPos +
-        ") rotate(" +
-        rotation +
-        ", " +
-        deskAreaWidth / 2 +
-        "," +
-        deskAreaHeight / 2 +
-        ")"
-    );
+    desk
+      .attr(
+        "transform",
+        "translate(" +
+          xPos +
+          ", " +
+          yPos +
+          ") rotate(" +
+          rotation +
+          ", " +
+          deskAreaWidth / 2 +
+          "," +
+          deskAreaHeight / 2 +
+          ")"
+      )
+      .attr("id", "desk");
   }
 
-  placeDesk(0, 35, 0);
+  const deskElem = $("#desk");
+  const room = $("#room");
+
+  placeDesk(0, 35, 30);
 </script>
