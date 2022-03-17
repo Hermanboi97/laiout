@@ -74,7 +74,7 @@
     type="range"
     name="rotation"
     min="0"
-    max="359"
+    max="360"
     value="0"
   />
   <br /><br />
@@ -475,14 +475,14 @@
       var xPos = x(d.x);
       var yPos = y(d.y);
 
-      // a and b for pythoagoras
+      // a and b for pythagoras
       var a = xPos - lastPoint.x;
       var b = yPos - lastPoint.y;
 
       // helper var to console.log
       var currentFormatted = { x: xPos, y: yPos };
 
-      // Distance using pythoagoras
+      // Distance using pythagoras
       var distance = Math.sqrt(a * a + b * b);
 
       // How many furnitures fits along wall
@@ -501,6 +501,22 @@
           var p2 = {
             x: lastPoint.x + ((deskAreaWidth * i) / distance) * a,
             y: lastPoint.y + ((deskAreaWidth * i) / distance) * b,
+          };
+
+          // Calculate rotation needed for desk front to stand parallel to wall
+          function angle(cx, cy, ex, ey) {
+            var dy = ey - cy;
+            var dx = ex - cx;
+            var theta = Math.atan2(dy, dx); // range (-PI, PI]
+            theta *= 180 / Math.PI; // rads to degs, range (-180, 180]
+            //if (theta < 0) theta = 360 + theta; // range [0, 360)
+            return theta;
+          }
+
+          p2 = {
+            x: p2.x,
+            y: p2.y,
+            r: angle(p2.x, p2.y, xPos, yPos),
           };
 
           availablePlacementsArray.push(p2);
@@ -557,7 +573,8 @@
     deskPlacements.forEach((d) => {
       var xPos = d.x - deskAreaWidth;
       var yPos = d.y - deskAreaHeight;
-      placeDesk(xPos, yPos, 0);
+
+      placeDesk(xPos, yPos, d.r);
     });
   }
 
