@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script type="module" src="./desk.js"></script>
+    <script type="module" src="./createRoom.js"></script>
+    <script src="./laiout.js"></script>
+  </head>
+  <style>
+    .area {
+      fill: white;
+      stroke: black;
+      stroke-width: 3px;
+    }
+    .desk {
+      fill: #f4f5fc;
+      stroke: black;
+      stroke-width: 2;
+    }
+    .desk-area {
+      fill: none;
+      stroke: black;
+      stroke-width: 1;
+      stroke-dasharray: 5, 5;
+    }
+    .grid line {
+      fill: none;
+      stroke: rgba(0, 0, 0, 0.2);
+      stroke-width: 1;
+    }
+    .circle {
+      fill: steelblue;
+      stroke: #fff;
+      stroke-width: 3px;
+    }
+  </style>
+  <body>
+    <svg id="area"></svg>
+    <div id="grid" style="margin-bottom: 60px"></div>
+    <button id="placeAllDesks">Place all Desks</button>
+    <br /><br />
+    <button id="enumerateCorners">Enumerate corners</button>
+    <button id="togglePlacements">Toggle desk placements</button>
+    <br /><br />
+    <button id="markFront">Mark front of desks</button>
+    <button id="toggleArea">Toggle room area</button>
+    <br /><br />
+    <label for="rotation">Rotation</label><br />
+    <input
+      id="rotation"
+      type="range"
+      name="rotation"
+      min="0"
+      max="360"
+      value="0"
+    />
+    <br /><br />
+    <label for="x">X</label><br />
+    <input id="x" type="range" name="x" min="0" max="1000" value="0" />
+    <br /><br />
+    <label for="y">Y</label><br />
+    <input id="y" type="range" name="y" min="0" max="1000" value="0" />
+  </body>
+</html>
