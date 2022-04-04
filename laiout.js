@@ -209,8 +209,8 @@ function placeAllDesks() {
       for (let b of placedDesks) {
         var rec2 = getEdgesOfRectangle(
           { x: b.x, y: b.y },
-          deskAreaDimensions.width / 2,
-          deskAreaDimensions.height / 2,
+          deskAreaDimensions.width - 1,
+          deskAreaDimensions.height - 1,
           b.r
         );
 
@@ -230,6 +230,16 @@ function placeAllDesks() {
         console.log(deskPlacements.indexOf(d) + 1);
         placeDesk(xPos, yPos, d.r);
         placedDesks.push(d);
+        svg
+          .selectAll(".point")
+          .data(rec1)
+          .enter()
+          .append("circle")
+          .attr("fill", "blue")
+          .attr("r", 4)
+          .attr("transform", function (d) {
+            return "translate(" + d.x + "," + d.y + ")";
+          });
       }
     } else {
       console.log(deskPlacements.indexOf(d) + 1);
@@ -350,4 +360,6 @@ $(document).ready(function () {
     });
 
   //placeDesk(position.x, position.y, position.rotation);
+
+  placeAllDesks();
 });

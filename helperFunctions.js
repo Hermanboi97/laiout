@@ -67,36 +67,51 @@ export function doPolygonsIntersect(a, b) {
  */
 
 export function getEdgesOfRectangle(center, width, height, rotation) {
-  if (rotation > 0) {
-    rotation = 360 + rotation;
-  }
+  // Convert to radians
+  rotation = rotation * (Math.PI / 180);
   var topRight = {
-    x: center.x + (width / 2) * Cos(rotation) - (height / 2) * Sin(rotation),
-    y: center.y + (width / 2) * Sin(rotation) + (height / 2) * Cos(rotation),
+    x:
+      center.x +
+      (width / 2) * Math.cos(rotation) -
+      (height / 2) * Math.sin(rotation),
+    y:
+      center.y +
+      (width / 2) * Math.sin(rotation) +
+      (height / 2) * Math.cos(rotation),
   };
 
   var topLeft = {
-    x: center.x - (width / 2) * Cos(rotation) - (height / 2) * Sin(rotation),
-    y: center.y - (width / 2) * Sin(rotation) + (height / 2) * Cos(rotation),
+    x:
+      center.x -
+      (width / 2) * Math.cos(rotation) -
+      (height / 2) * Math.sin(rotation),
+    y:
+      center.y -
+      (width / 2) * Math.sin(rotation) +
+      (height / 2) * Math.cos(rotation),
   };
 
   var bottomLeft = {
-    x: center.x - (width / 2) * Cos(rotation) + (height / 2) * Sin(rotation),
-    y: center.y - (width / 2) * Sin(rotation) - (height / 2) * Cos(rotation),
+    x:
+      center.x -
+      (width / 2) * Math.cos(rotation) +
+      (height / 2) * Math.sin(rotation),
+    y:
+      center.y -
+      (width / 2) * Math.sin(rotation) -
+      (height / 2) * Math.cos(rotation),
   };
 
   var bottomRight = {
-    x: center.x + (width / 2) * Cos(rotation) + (height / 2) * Sin(rotation),
-    y: center.y + (width / 2) * Sin(rotation) - (height / 2) * Cos(rotation),
+    x:
+      center.x +
+      (width / 2) * Math.cos(rotation) +
+      (height / 2) * Math.sin(rotation),
+    y:
+      center.y +
+      (width / 2) * Math.sin(rotation) -
+      (height / 2) * Math.cos(rotation),
   };
 
   return [topRight, topLeft, bottomLeft, bottomRight];
-}
-
-function Cos(angle) {
-  return Math.cos(angle);
-}
-
-function Sin(angle) {
-  return Math.sin(angle);
 }
