@@ -4,6 +4,7 @@ import {
   deskAreaDimensions,
   tableDimensions,
 } from "./desk.js";
+import { doPolygonsIntersect, getEdgesOfRectangle } from "./helperFunctions.js";
 
 export class FurnitureDimensions {
   constructor(width, height) {
@@ -187,11 +188,54 @@ function findAvailablePlacements(array) {
 }
 
 function placeAllDesks() {
+  console.log(deskPlacements);
+
+  var placedDesks = [];
+
   deskPlacements.forEach((d) => {
     var xPos = d.x;
     var yPos = d.y;
 
-    placeDesk(xPos, yPos, d.r);
+    var rec1 = getEdgesOfRectangle(
+      { x: xPos, y: yPos },
+      deskAreaDimensions.width,
+      deskAreaDimensions.height,
+      d.r
+    );
+
+    var collision = false;
+
+    if (deskPlacements.indexOf(d) > 0) {
+      for (let b of placedDesks) {
+        var rec2 = getEdgesOfRectangle(
+          { x: b.x, y: b.y },
+          deskAreaDimensions.width / 2,
+          deskAreaDimensions.height / 2,
+          b.r
+        );
+
+        if (doPolygonsIntersect(rec1, rec2)) {
+          console.log(
+            deskPlacements.indexOf(d) + 1,
+            placedDesks.indexOf(b) + 1,
+            rec1,
+            rec2
+          );
+          collision = true;
+          break;
+        }
+      }
+
+      if (!collision) {
+        console.log(deskPlacements.indexOf(d) + 1);
+        placeDesk(xPos, yPos, d.r);
+        placedDesks.push(d);
+      }
+    } else {
+      console.log(deskPlacements.indexOf(d) + 1);
+      placeDesk(xPos, yPos, d.r);
+      placedDesks.push(d);
+    }
   });
 }
 
@@ -305,5 +349,5 @@ $(document).ready(function () {
       return "translate(" + d.x + "," + d.y + ")";
     });
 
-  placeDesk(position.x, position.y, position.rotation);
+  //placeDesk(position.x, position.y, position.rotation);
 });
