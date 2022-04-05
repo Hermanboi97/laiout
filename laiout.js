@@ -1,4 +1,13 @@
-import { height, outerWall, svg, width, x, y } from "./createRoom.js";
+import {
+  drawRoom,
+  height,
+  margin,
+  outerWall as outerwallOriginal,
+  svg,
+  width,
+  x,
+  y,
+} from "./createRoom.js";
 import {
   chairDimensions,
   deskAreaDimensions,
@@ -13,12 +22,15 @@ export class FurnitureDimensions {
   }
 }
 
+var outerWall = [...outerwallOriginal];
+
 var deskPlacements = [];
 
 var markDeskFront = false,
   showRoomArea = false,
   enumerateCorners = false,
-  togglePlacements = false;
+  togglePlacements = false,
+  toggleDeskCorners = false;
 
 // Desk
 function placeDesk(xPos = 0, yPos = 95, rotation = 0) {
@@ -83,10 +95,11 @@ function placeDesk(xPos = 0, yPos = 95, rotation = 0) {
         rotation +
         ")"
     )
-    .attr("id", "desk");
+    .attr("class", "desk");
 }
 
 function findAvailablePlacements(array) {
+  deskPlacements = [];
   var lastPoint = { x: x(outerWall[0].x), y: y(outerWall[0].y) };
 
   function fillArrayWithPlacements(d) {
@@ -159,7 +172,7 @@ function findAvailablePlacements(array) {
 
     getPlacementCoordinates();
 
-    console.log(
+    /*     console.log(
       outerWall.indexOf(d) +
         " Last: " +
         JSON.stringify(lastPoint) +
@@ -170,7 +183,7 @@ function findAvailablePlacements(array) {
         " Placements: " +
         availablePlacements
     );
-    console.log(availablePlacementsArray);
+    console.log(availablePlacementsArray); */
 
     deskPlacements.push(...availablePlacementsArray);
     lastPoint = { x: xPos, y: yPos };
@@ -188,7 +201,7 @@ function findAvailablePlacements(array) {
 }
 
 function placeAllDesks() {
-  console.log(deskPlacements);
+  //console.log(deskPlacements);
 
   var placedDesks = [];
 
@@ -198,8 +211,8 @@ function placeAllDesks() {
 
     var rec1 = getEdgesOfRectangle(
       { x: xPos, y: yPos },
-      deskAreaDimensions.width,
-      deskAreaDimensions.height,
+      deskAreaDimensions.width - 3,
+      deskAreaDimensions.height - 3,
       d.r
     );
 
@@ -215,19 +228,12 @@ function placeAllDesks() {
         );
 
         if (doPolygonsIntersect(rec1, rec2)) {
-          console.log(
-            deskPlacements.indexOf(d) + 1,
-            placedDesks.indexOf(b) + 1,
-            rec1,
-            rec2
-          );
           collision = true;
           break;
         }
       }
 
       if (!collision) {
-        console.log(deskPlacements.indexOf(d) + 1);
         placeDesk(xPos, yPos, d.r);
         placedDesks.push(d);
         svg
@@ -235,6 +241,8 @@ function placeAllDesks() {
           .data(rec1)
           .enter()
           .append("circle")
+          .attr("class", "deskCorner")
+          .attr("visibility", "hidden")
           .attr("fill", "blue")
           .attr("r", 4)
           .attr("transform", function (d) {
@@ -242,7 +250,6 @@ function placeAllDesks() {
           });
       }
     } else {
-      console.log(deskPlacements.indexOf(d) + 1);
       placeDesk(xPos, yPos, d.r);
       placedDesks.push(d);
     }
@@ -250,11 +257,11 @@ function placeAllDesks() {
 }
 
 $(document).ready(function () {
-  $("#desk").click(() => {
+  $(".desk").click(() => {
     console.log("click");
   });
 
-  $("#desk")
+  $(".desk")
     .on("mousedown", function () {
       $().mousemove(function (e) {
         window.mouseXPos = e.pageX;
@@ -298,6 +305,14 @@ $(document).ready(function () {
     );
   });
 
+  $("#toggleDeskCorners").click(() => {
+    toggleDeskCorners = !toggleDeskCorners;
+    $(".deskCorner").css(
+      "visibility",
+      toggleDeskCorners ? "visible" : "hidden"
+    );
+  });
+
   // Setting boundary for postion sliders
 
   $("#x").attr({
@@ -310,7 +325,7 @@ $(document).ready(function () {
   });
 
   function updateDesk() {
-    svg.selectAll("#desk").remove();
+    svg.selectAll(".desk").remove();
     placeDesk(position.x, position.y, position.rotation);
   }
 
@@ -334,16 +349,53 @@ $(document).ready(function () {
     .data(outerWall)
     .enter()
     .append("text")
-    .attr("stroke", "red")
+    .attr("d", (d, i) => {
+      return { d: d, i: i };
+    })
     .attr("class", "cornerText")
     .text((t) => outerWall.indexOf(t))
     .attr("visibility", "hidden")
     .attr("transform", function (d) {
       return "translate(" + x(d.x) + "," + y(d.y) + ")";
-    });
+    })
+    .call(
+      d3
+        .drag()
+        .on("start", () => {})
+        .on("drag", dragCorner)
+        .on("end", () => {})
+    );
+
+  // Does not work fully
+  function dragCorner(d, index) {
+    console.log(d, index);
+
+    var newPosition = {
+      x: d3.event.sourceEvent.clientX - margin.left - 10,
+      y: d3.event.sourceEvent.clientY - margin.top,
+    };
+
+    d3.select(this).attr(
+      "transform",
+      "translate(" + newPosition.x + "," + newPosition.y + ")"
+    );
+
+    if (index)
+      outerWall[index] = {
+        x: Math.round(x.invert(newPosition.x)),
+        y: Math.round(y.invert(newPosition.y)),
+      };
+
+    // update room
+    svg.selectAll(".area").remove();
+    svg.selectAll(".desk").remove();
+    svg.selectAll(".desk-area").remove();
+    drawRoom(outerWall);
+    findAvailablePlacements(outerWall);
+    placeAllDesks();
+  }
 
   // Mark desk placements along wall
-
   findAvailablePlacements(outerWall);
 
   svg

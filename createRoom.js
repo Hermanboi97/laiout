@@ -172,29 +172,44 @@ var doorsSVG = svg
   .attr("class", "area")
   .attr("d", area);
 
-// Floor
-var floor = svg
-  .append("path")
-  .attr("d", area(outerWall))
-  .attr("fill", "rgb(134 239 172)")
-  .attr("visibility", "hidden")
-  .attr("id", "room");
+export function drawRoom(outerWall) {
+  svg.selectAll(".grid").remove();
+  svg.selectAll(".area").remove();
+  svg.select("#room").remove();
+  svg.select("#area-clip").remove();
 
-svg
-  .append("clipPath")
-  .attr("id", "area-clip")
-  .append("path")
-  .attr("d", area(outerWall));
+  var wallSVG = svg
+    .append("path")
+    .datum(outerWall)
+    .attr("class", "area")
+    .attr("d", area);
 
-// Grid
-var grid = svg.append("g").attr("clip-path", "url(#area-clip)");
+  // Floor
+  var floor = svg
+    .append("path")
+    .attr("d", area(outerWall))
+    .attr("fill", "rgb(134 239 172)")
+    .attr("visibility", "hidden")
+    .attr("id", "room");
 
-grid
-  .append("g")
-  .attr("class", "grid")
-  .attr("transform", "translate(0," + height + ")")
-  .call(xAxis.tickSize(-height).tickFormat(""));
-grid
-  .append("g")
-  .attr("class", "grid")
-  .call(yAxis.tickSize(-width).tickFormat(""));
+  svg
+    .append("clipPath")
+    .attr("id", "area-clip")
+    .append("path")
+    .attr("d", area(outerWall));
+
+  // Grid
+  var grid = svg.append("g").attr("clip-path", "url(#area-clip)");
+
+  grid
+    .append("g")
+    .attr("class", "grid")
+    .attr("transform", "translate(0," + height + ")")
+    .call(xAxis.tickSize(-height).tickFormat(""));
+  grid
+    .append("g")
+    .attr("class", "grid")
+    .call(yAxis.tickSize(-width).tickFormat(""));
+}
+
+drawRoom(outerWall);

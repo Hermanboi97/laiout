@@ -35,6 +35,11 @@
       stroke: #fff;
       stroke-width: 3px;
     }
+    .cornerText {
+      stroke: red;
+      user-select: none;
+      cursor: pointer;
+    }
   </style>
   <body>
     <svg id="area"></svg>
@@ -43,6 +48,7 @@
     <br /><br />
     <button id="enumerateCorners">Enumerate corners</button>
     <button id="togglePlacements">Toggle desk placements</button>
+    <button id="toggleDeskCorners">Toggle desk corners</button>
     <br /><br />
     <button id="markFront">Mark front of desks</button>
     <button id="toggleArea">Toggle room area</button>
