@@ -13,7 +13,12 @@ import {
   deskAreaDimensions,
   tableDimensions,
 } from "./desk.js";
-import { doPolygonsIntersect, getEdgesOfRectangle } from "./helperFunctions.js";
+import {
+  distToSegment,
+  doPolygonsIntersect,
+  getEdgesOfRectangle,
+  lineRect,
+} from "./helperFunctions.js";
 
 export class FurnitureDimensions {
   constructor(width, height) {
@@ -25,6 +30,9 @@ export class FurnitureDimensions {
 var outerWall = [...outerwallOriginal];
 
 var deskPlacements = [];
+
+// clearing around furniture, must be greater than 0.
+var clearing = 1;
 
 var markDeskFront = false,
   showRoomArea = false,
@@ -118,7 +126,9 @@ function findAvailablePlacements(array) {
     var distance = Math.sqrt(a * a + b * b);
 
     // How many furnitures fits along wall
-    var availablePlacements = Math.floor(distance / deskAreaDimensions.width);
+    var availablePlacements = Math.floor(
+      distance / (deskAreaDimensions.width + clearing * 2)
+    );
     var availablePlacementsArray = [];
 
     // Formula for point between two points x distance from point 1:
@@ -133,12 +143,14 @@ function findAvailablePlacements(array) {
         var p2 = {
           x:
             lastPoint.x +
-            ((deskAreaDimensions.width * i + deskAreaDimensions.width / 2) /
+            (((deskAreaDimensions.width + clearing * 2) * i +
+              deskAreaDimensions.width / 2) /
               distance) *
               a,
           y:
             lastPoint.y +
-            ((deskAreaDimensions.width * i + deskAreaDimensions.width / 2) /
+            (((deskAreaDimensions.width + clearing * 2) * i +
+              deskAreaDimensions.width / 2) /
               distance) *
               b,
         };
@@ -157,8 +169,8 @@ function findAvailablePlacements(array) {
         // https://stackoverflow.com/a/47042912/6817961
         var L = Math.sqrt(a * a + b * b);
         var U = { x: -b / L, y: a / L };
-        var newX = p2.x - U.x * (deskAreaDimensions.height / 2);
-        var newY = p2.y - U.y * (deskAreaDimensions.height / 2);
+        var newX = p2.x - U.x * (deskAreaDimensions.height / 2 + clearing);
+        var newY = p2.y - U.y * (deskAreaDimensions.height / 2 + clearing);
 
         p2 = {
           x: newX,
@@ -211,8 +223,8 @@ function placeAllDesks() {
 
     var rec1 = getEdgesOfRectangle(
       { x: xPos, y: yPos },
-      deskAreaDimensions.width - 3,
-      deskAreaDimensions.height - 3,
+      deskAreaDimensions.width,
+      deskAreaDimensions.height,
       d.r
     );
 
@@ -233,7 +245,46 @@ function placeAllDesks() {
         }
       }
 
-      if (!collision) {
+      var collidesWithWall = false;
+
+      // Only works for circles, use instead: http://www.jeffreythompson.org/collision-detection/line-rect.php
+      for (let i = 0; i < outerWall.length; i++) {
+        var a = outerWall[i];
+
+        a = {
+          x: x(a.x),
+          y: y(a.y),
+        };
+
+        let nextPoint = outerWall[i + 1];
+
+        if (nextPoint === undefined) nextPoint = outerWall[0];
+
+        let b = {
+          x: x(nextPoint.x),
+          y: y(nextPoint.y),
+        };
+
+        var tooCloseToWall =
+          distToSegment(xPos, yPos, a.x, a.y, b.x, b.y) <
+          deskAreaDimensions.width / 2;
+
+        if (lineRect(b.x, b.y, a.x, a.y, rec1[0], rec1[1], rec1[2], rec1[3])) {
+          console.log(
+            deskPlacements.indexOf(d),
+            i,
+            a.x,
+            a.y,
+            b.x,
+            b.y,
+            lineRect(b.x, b.y, a.x, a.y, rec1[0], rec1[1], rec1[2], rec1[3])
+          );
+          collidesWithWall = true;
+          break;
+        }
+      }
+
+      if (!(collision || collidesWithWall)) {
         placeDesk(xPos, yPos, d.r);
         placedDesks.push(d);
         svg
@@ -368,8 +419,6 @@ $(document).ready(function () {
 
   // Does not work fully
   function dragCorner(d, index) {
-    console.log(d, index);
-
     var newPosition = {
       x: d3.event.sourceEvent.clientX - margin.left - 10,
       y: d3.event.sourceEvent.clientY - margin.top,
@@ -390,6 +439,7 @@ $(document).ready(function () {
     svg.selectAll(".area").remove();
     svg.selectAll(".desk").remove();
     svg.selectAll(".desk-area").remove();
+    svg.selectAll(".deskCorner").remove();
     drawRoom(outerWall);
     findAvailablePlacements(outerWall);
     placeAllDesks();

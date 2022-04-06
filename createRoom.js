@@ -107,7 +107,7 @@ export var outerWall = [
   },
 ];
 export var margin = { top: 20, right: 20, bottom: 30, left: 30 },
-  width = 400 - margin.left - margin.right,
+  width = 400 - margin.left - margin.right + 10,
   height = 350 - margin.top - margin.bottom;
 
 export var x = d3
@@ -134,6 +134,7 @@ var xAxis = d3.axisBottom().scale(x);
 
 var yAxis = d3.axisLeft().scale(y);
 
+// Gets area of room
 export var area = d3
   .area()
   .x(function (d) {
@@ -177,6 +178,7 @@ export function drawRoom(outerWall) {
   svg.selectAll(".area").remove();
   svg.select("#room").remove();
   svg.select("#area-clip").remove();
+  svg.select("g").remove();
 
   var wallSVG = svg
     .append("path")
