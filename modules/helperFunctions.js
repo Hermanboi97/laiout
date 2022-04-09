@@ -58,7 +58,6 @@ export function doPolygonsIntersect(a, b) {
       }
     }
   }
-  console.log("Polygons do intersect!");
   return true;
 }
 
@@ -223,4 +222,65 @@ function lineLine(x1, y1, x2, y2, x3, y3, x4, y4) {
     return true;
   }
   return false;
+}
+
+export function distanceBetweenPoints(p1, p2) {
+  // a and b for pythagoras
+  var a = p2.x - p1.x;
+  var b = p2.y - p1.y;
+
+  // Distance using pythagoras
+  return Math.sqrt(a * a + b * b);
+}
+
+// Formula for point on line between two points (p1, p2) standing given distance from p1:
+// https://math.stackexchange.com/a/2045181
+export function findPointOnLine(p1, p2, distance) {
+  var fullLength = distanceBetweenPoints(p1, p2);
+  var x = p1.x + (distance / fullLength) * (p2.x - p1.x);
+  var y = p1.y + (distance / fullLength) * (p2.y - p1.y);
+
+  return { x: x, y: y };
+}
+
+// Calculate rotation needed for desk front to stand parallel to wall
+export function angle(cx, cy, ex, ey) {
+  var dy = ey - cy;
+  var dx = ex - cx;
+  var theta = Math.atan2(dy, dx); // range (-PI, PI]
+  theta *= 180 / Math.PI; // rads to degs, range (-180, 180]
+  //if (theta < 0) theta = 360 + theta; // range [0, 360)
+  return theta;
+}
+
+// Find the point perpundicular to the wall laying a given length from the wall on
+// https://stackoverflow.com/a/47042912/6817961
+export function extendPointPerpendicularly(
+  l1,
+  l2,
+  point,
+  distance,
+  side = "left"
+) {
+  // Line vector D = P2 - P1 (dx=x2-x1, dy = y2-y1)
+  var dx = l2.x - l1.x;
+  var dy = l2.y - l1.y;
+
+  //Length of line
+  var L = distanceBetweenPoints(l1, l2);
+
+  // Perpendicular vector
+  var perpVector = { x: -dy / L, y: dx / L };
+
+  // Coordiantes of point lying at distance from original point
+  var newX = point.x - perpVector.x * distance;
+  var newY = point.y - perpVector.y * distance;
+
+  // Extend point to the right of wall instead
+  if (side === "right") {
+    newX = point.x + perpVector.x * distance;
+    newY = point.y + perpVector.y * distance;
+  }
+
+  return { x: newX, y: newY };
 }

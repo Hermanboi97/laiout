@@ -152,27 +152,6 @@ export var svg = d3
   .append("g")
   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-// Room outline
-export var wallSVG = svg
-  .append("path")
-  .datum(outerWall)
-  .attr("class", "area")
-  .attr("d", area);
-
-// Windows
-var windowSVG = svg
-  .append("path")
-  .datum(windows)
-  .attr("class", "area")
-  .attr("d", area);
-
-// Doors
-var doorsSVG = svg
-  .append("path")
-  .datum(doors)
-  .attr("class", "area")
-  .attr("d", area);
-
 export function drawRoom(outerWall) {
   svg.selectAll(".grid").remove();
   svg.selectAll(".area").remove();
@@ -203,15 +182,49 @@ export function drawRoom(outerWall) {
   // Grid
   var grid = svg.append("g").attr("clip-path", "url(#area-clip)");
 
+  var maxWidth = d3.max(outerWall, function (d) {
+    return x(d.x);
+  });
+
+  var maxHeight = d3.max(outerWall, function (d) {
+    return y(d.y);
+  });
+
   grid
     .append("g")
     .attr("class", "grid")
-    .attr("transform", "translate(0," + height + ")")
-    .call(xAxis.tickSize(-height).tickFormat(""));
+    .attr("transform", "translate(0," + maxHeight + ")")
+    .call(xAxis.tickSize(-maxHeight).tickFormat(""));
   grid
     .append("g")
     .attr("class", "grid")
-    .call(yAxis.tickSize(-width).tickFormat(""));
+    .call(yAxis.tickSize(-maxWidth).tickFormat(""));
+
+  // Windows
+  var windowSVG = svg
+    .append("path")
+    .datum(windows)
+    .attr("class", "area")
+    .attr("d", area);
+
+  // Doors
+  var doorsSVG = svg
+    .append("path")
+    .datum(doors)
+    .attr("class", "area")
+    .attr("d", area);
+}
+
+export function drawPoint(p) {
+  svg
+    .selectAll(".point")
+    .data(p)
+    .enter()
+    .append("circle")
+    .attr("class", "markedPoint")
+    .attr("fill", "red")
+    .attr("r", 4)
+    .attr("transform", "translate(" + p.x + "," + p.y + ")");
 }
 
 drawRoom(outerWall);

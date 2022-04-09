@@ -1,4 +1,4 @@
-import { FurnitureDimensions } from "./laiout.js";
+import { FurnitureDimensions } from "../laiout.js";
 
 // Dimensions of desk
 export const deskAreaDimensions = new FurnitureDimensions(70, 70);
