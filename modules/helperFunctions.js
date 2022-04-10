@@ -284,3 +284,55 @@ export function extendPointPerpendicularly(
 
   return { x: newX, y: newY };
 }
+
+// Is point (p) on line (a->b) within tolerance given: https://stackoverflow.com/a/16271191/6818506
+export function isPointOnLine(a, b, p, tolerance) {
+  var dy = a.y - b.y;
+  var dx = a.x - b.x;
+  if (dy == 0) {
+    //horizontal line
+    if (p.y == a.y) {
+      if (a.x > b.x) {
+        if (p.x <= a.x && p.x >= b.x) return true;
+      } else {
+        if (p.x >= a.x && p.x <= b.x) return true;
+      }
+    }
+  } else if (dx == 0) {
+    //vertical line
+    if (p.x == a.x) {
+      if (a.y > b.y) {
+        if (p.y <= a.y && p.y >= b.y) return true;
+      } else {
+        if (p.y >= a.y && p.y <= b.y) return true;
+      }
+    }
+  } else {
+    //slope line
+    var p = dy / dx;
+    var py = p * p.x;
+    if (py <= p.y + tolerance && py >= p.y - tolerance) {
+      if (a.x > b.x) {
+        if (p.x <= a.x && p.x >= b.x) return true;
+      } else {
+        if (p.x >= a.x && p.x <= b.x) return true;
+      }
+    }
+  }
+  return false;
+}
+
+export function getPolygonEdges(poly, tolerance) {
+  var start = poly[0];
+  var mid = poly[index + 1];
+  var end = poly[index + 2];
+  var edges = [poly];
+  poly.forEach((p, index) => {
+    if (isPointOnLine(start, end, mid, tolerance)) {
+      edges.slice(index + 1, index + 1);
+    }
+
+    mid = poly[index + 1];
+    end = poly[index + 2];
+  });
+}

@@ -110,7 +110,7 @@ export var margin = { top: 20, right: 20, bottom: 30, left: 30 },
   width = 400 - margin.left - margin.right + 10,
   height = 350 - margin.top - margin.bottom;
 
-export var x = d3
+export var scaleX = d3
   .scaleLinear()
   .domain([
     0,
@@ -120,7 +120,7 @@ export var x = d3
   ])
   .range([0, width]);
 
-export var y = d3
+export var scaleY = d3
   .scaleLinear()
   .domain([
     0,
@@ -130,19 +130,19 @@ export var y = d3
   ])
   .range([height, 0]);
 
-var xAxis = d3.axisBottom().scale(x);
+var xAxis = d3.axisBottom().scale(scaleX);
 
-var yAxis = d3.axisLeft().scale(y);
+var yAxis = d3.axisLeft().scale(scaleY);
 
 // Gets area of room
 export var area = d3
   .area()
   .x(function (d) {
-    return x(d.x);
+    return scaleX(d.x);
   })
   .y0(height)
   .y1(function (d) {
-    return y(d.y);
+    return scaleY(d.y);
   });
 
 export var svg = d3
@@ -183,11 +183,11 @@ export function drawRoom(outerWall) {
   var grid = svg.append("g").attr("clip-path", "url(#area-clip)");
 
   var maxWidth = d3.max(outerWall, function (d) {
-    return x(d.x);
+    return scaleX(d.x);
   });
 
   var maxHeight = d3.max(outerWall, function (d) {
-    return y(d.y);
+    return scaleY(d.y);
   });
 
   grid

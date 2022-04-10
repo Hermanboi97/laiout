@@ -2,9 +2,9 @@ import {
   drawRoom,
   margin,
   outerWall as outerwallOriginal,
+  scaleX,
+  scaleY,
   svg,
-  x,
-  y,
 } from "./modules/createRoom.js";
 import {
   chairDimensions,
@@ -99,13 +99,13 @@ function findAvailablePlacements(walls) {
   allPlacements = [];
 
   // Start-point of wall (scaled up)
-  var wallStart = { x: x(outerWall[0].x), y: y(outerWall[0].y) };
+  var wallStart = { x: scaleX(outerWall[0].x), y: scaleY(outerWall[0].y) };
 
   function getWallPlacements(d) {
     // end-point of current wall (scaled up)
     var wallEnd = {
-      x: x(d.x),
-      y: y(d.y),
+      x: scaleX(d.x),
+      y: scaleY(d.y),
     };
 
     var placementsAlongWall = [];
@@ -170,8 +170,8 @@ function dragCorner(d, index) {
 
   if (index)
     outerWall[index] = {
-      x: Math.round(x.invert(newPosition.x)),
-      y: Math.round(y.invert(newPosition.y)),
+      x: Math.round(scaleX.invert(newPosition.x)),
+      y: Math.round(scaleY.invert(newPosition.y)),
     };
 
   // update room
@@ -197,7 +197,7 @@ $(document).ready(function () {
     .text((t) => outerWall.indexOf(t))
     .attr("visibility", "hidden")
     .attr("transform", function (d) {
-      return "translate(" + x(d.x) + "," + y(d.y) + ")";
+      return "translate(" + scaleX(d.x) + "," + scaleY(d.y) + ")";
     })
     .call(
       d3
@@ -236,6 +236,9 @@ $(document).ready(function () {
     });
 
   //placeDesk(position.x, position.y, position.rotation);
+
+  // https://bl.ocks.org/RiseupDev/b07f7ccc1c499efc24e9
+  // http://jsfiddle.net/rs7u0qhx/2/
 
   //placeAllDesks();
 });

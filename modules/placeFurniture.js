@@ -1,4 +1,4 @@
-import { x, y } from "./createRoom.js";
+import { scaleX, scaleY } from "./createRoom.js";
 import {
   angle,
   distanceBetweenPoints,
@@ -88,8 +88,8 @@ export function getPlacementCoordinates(
         var a = outerWall[i];
 
         a = {
-          x: x(a.x),
-          y: y(a.y),
+          x: scaleX(a.x),
+          y: scaleY(a.y),
         };
 
         let nextPoint = outerWall[i + 1];
@@ -97,8 +97,8 @@ export function getPlacementCoordinates(
         if (nextPoint === undefined) nextPoint = outerWall[0];
 
         let b = {
-          x: x(nextPoint.x),
-          y: y(nextPoint.y),
+          x: scaleX(nextPoint.x),
+          y: scaleY(nextPoint.y),
         };
 
         if (lineRect(b.x, b.y, a.x, a.y, rec1[0], rec1[1], rec1[2], rec1[3])) {
