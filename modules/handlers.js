@@ -1,6 +1,6 @@
-import { placeAllDesks } from "../laiout.js";
 import { height, width } from "./createRoom.js";
 import { deskAreaDimensions } from "./desk.js";
+import { placeAllDesks } from "./placeFurniture.js";
 
 var markDeskFront = false,
   showRoomArea = false,

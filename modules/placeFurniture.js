@@ -1,4 +1,9 @@
-import { scaleX, scaleY } from "./createRoom.js";
+import { svg } from "./createRoom.js";
+import {
+  chairDimensions,
+  deskAreaDimensions,
+  tableDimensions,
+} from "./desk.js";
 import {
   angle,
   distanceBetweenPoints,
@@ -9,9 +14,14 @@ import {
   lineRect,
 } from "./helperFunctions.js";
 
+var allPlacements = [];
+
+// clearing around furniture, must be greater than 0.
+var clearing = 1;
+
 // Gets center coordinates of where furniture can be placed along given wall
 export function getPlacementCoordinates(
-  outerWall,
+  walls,
   wallStart,
   wallEnd,
   furnitureDimensions,
@@ -72,6 +82,8 @@ export function getPlacementCoordinates(
         tries
       );
 
+      console.log(point, remainingSpace, totalDeskWidth);
+
       var rec1 = getEdgesOfRectangle(
         { x: point.x, y: point.y },
         furnitureDimensions.width,
@@ -84,21 +96,21 @@ export function getPlacementCoordinates(
 
       // Check if furniture collides with the wall
       // http://www.jeffreythompson.org/collision-detection/line-rect.php
-      for (let i = 0; i < outerWall.length; i++) {
-        var a = outerWall[i];
+      for (let i = 0; i < walls.length; i++) {
+        var a = walls[i];
 
         a = {
-          x: scaleX(a.x),
-          y: scaleY(a.y),
+          x: a.x,
+          y: a.y,
         };
 
-        let nextPoint = outerWall[i + 1];
+        let nextPoint = walls[i + 1];
 
-        if (nextPoint === undefined) nextPoint = outerWall[0];
+        if (nextPoint === undefined) nextPoint = walls[0];
 
         let b = {
-          x: scaleX(nextPoint.x),
-          y: scaleY(nextPoint.y),
+          x: nextPoint.x,
+          y: nextPoint.y,
         };
 
         if (lineRect(b.x, b.y, a.x, a.y, rec1[0], rec1[1], rec1[2], rec1[3])) {
@@ -126,7 +138,7 @@ export function getPlacementCoordinates(
       }
 
       tries++;
-    } while (collision && remainingSpace >= totalDeskWidth);
+    } while (collision && remainingSpace >= totalDeskWidth && tries > 10);
 
     if (!(collision || collidesWithWall)) {
       placements.push(point);
@@ -138,4 +150,118 @@ export function getPlacementCoordinates(
     remainingSpace = distanceBetweenPoints(lastRecEnd, wallEnd);
   }
   return placements;
+}
+
+// Desk
+function placeDesk(xPos = 0, yPos = 95, rotation = 0) {
+  var desk = svg.append("g");
+
+  // Desk area
+  var deskArea = desk
+    .append("rect")
+    .attr("x", 0)
+    .attr("y", 0)
+    .attr("width", deskAreaDimensions.width)
+    .attr("height", deskAreaDimensions.height)
+    .attr("class", "desk-area");
+
+  // Chair
+  var chair = desk
+    .append("rect")
+    .attr("x", 20)
+    .attr("y", 15)
+    .attr("width", chairDimensions.width)
+    .attr("height", chairDimensions.height)
+    .attr("class", "desk");
+
+  // Table
+  var table = desk
+    .append("rect")
+    .attr("x", 0)
+    .attr("y", deskAreaDimensions.height - tableDimensions.height)
+    .attr("width", tableDimensions.width)
+    .attr("height", tableDimensions.height)
+    .attr("class", "desk");
+
+  // Front
+  var front = desk
+    .append("line")
+    .attr("x1", 0)
+    .attr("y1", deskAreaDimensions.height)
+    .attr("x2", deskAreaDimensions.width)
+    .attr("y2", deskAreaDimensions.height)
+    .attr("stroke", "rgb(14 165 233)")
+    .attr("stroke-width", 4)
+    .attr("visibility", "hidden")
+    .attr("class", "deskFrontLine");
+
+  // Group attributes
+  desk
+    .attr(
+      "transform-origin",
+      deskAreaDimensions.width / 2 + " " + deskAreaDimensions.height / 2
+    )
+    .attr(
+      "transform",
+      "translate(" +
+        xPos +
+        "," +
+        yPos +
+        ") translate(" +
+        -(deskAreaDimensions.width / 2) +
+        "," +
+        -(deskAreaDimensions.width / 2) +
+        ") rotate(" +
+        rotation +
+        ")"
+    )
+    .attr("class", "desk");
+}
+
+// Find desk placements
+export function findAvailablePlacements(walls) {
+  allPlacements = [];
+  console.log(walls);
+
+  // Start-point of wall (scaled up)
+  var wallStart = { x: walls[0].x, y: walls[0].y };
+
+  function getWallPlacements(d) {
+    // end-point of current wall (scaled up)
+    var wallEnd = {
+      x: d.x,
+      y: d.y,
+    };
+
+    var placementsAlongWall = [];
+
+    placementsAlongWall = getPlacementCoordinates(
+      walls,
+      wallStart,
+      wallEnd,
+      deskAreaDimensions,
+      clearing,
+      allPlacements
+    );
+
+    wallStart = { x: wallEnd.x, y: wallEnd.y }; // Move walls startpoint along
+    return placementsAlongWall;
+  }
+
+  // Find placement coordinates for all walls
+  walls.forEach(function (wall, index) {
+    allPlacements.push(...getWallPlacements(wall));
+
+    // Find placements along the last wall created by the last and the first point in wall array
+    if (index == walls.length - 1) {
+      allPlacements.push(...getWallPlacements(walls[0]));
+    }
+  });
+}
+
+// Place desks
+export function placeAllDesks() {
+  allPlacements.forEach((point) => {
+    placeDesk(point.x, point.y, point.r);
+  });
 }

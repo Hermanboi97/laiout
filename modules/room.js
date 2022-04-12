@@ -17,7 +17,7 @@ var svg = d3
 
 var g;
 
-var points = [
+var outerWall = [
   {
     x: 0,
     y: 0,
@@ -58,7 +58,7 @@ var scaleX = d3
   .scaleLinear()
   .domain([
     0,
-    d3.max(points, function (d) {
+    d3.max(outerWall, function (d) {
       return d.x;
     }),
   ])
@@ -68,7 +68,7 @@ var scaleY = d3
   .scaleLinear()
   .domain([
     0,
-    d3.max(points, function (d) {
+    d3.max(outerWall, function (d) {
       return d.y;
     }),
   ])
@@ -82,13 +82,13 @@ function scalePoints(points) {
   }));
 }
 
-points = scalePoints(points);
+outerWall = scalePoints(outerWall);
 
-var maxWidth = d3.max(points, function (d) {
+var maxWidth = d3.max(outerWall, function (d) {
   return d.x;
 });
 
-var maxHeight = d3.max(points, function (d) {
+var maxHeight = d3.max(outerWall, function (d) {
   return d.y;
 });
 
@@ -154,7 +154,7 @@ var areaClip = svg
   .append("clipPath")
   .attr("id", "area-clip")
   .append("path")
-  .attr("d", area(points));
+  .attr("d", area(outerWall));
 
 // Grid: https://bl.ocks.org/cagrimmett/07f8c8daea00946b9e704e3efcbd5739#grid.js
 var grid = svg
@@ -204,14 +204,14 @@ function formatPoints(points) {
 function drawPolygon() {
   var g = svg.append("g");
   g.append("polygon")
-    .attr("points", formatPoints(points))
+    .attr("points", formatPoints(outerWall))
     .style("fill", "transparent")
     .attr("stroke", "#000")
     .attr("stroke-width", 3);
 
   var circle = g
     .selectAll("circles")
-    .data(points)
+    .data(outerWall)
     .enter()
     .append("circle")
     .attr("cx", (p) => p.x)
@@ -222,7 +222,7 @@ function drawPolygon() {
     .attr("cursor", "move")
     .call(dragger);
 
-  points.splice(0);
+  outerWall.splice(0);
   drawing = false;
 }
 
