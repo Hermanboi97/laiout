@@ -37,9 +37,11 @@ function drawRectangleCorners(rec) {
 
 // Drag room corners
 function dragCorner(d, index) {
+  const dim = document.getElementById("area").getBoundingClientRect();
+
   var newPosition = {
-    x: d3.event.sourceEvent.clientX - margin.left - 10,
-    y: d3.event.sourceEvent.clientY - margin.top,
+    x: d3.event.sourceEvent.clientX - dim.left - margin.left / 2,
+    y: d3.event.sourceEvent.clientY - dim.top - margin.top / 2,
   };
 
   d3.select(this).attr(

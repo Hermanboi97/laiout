@@ -106,7 +106,7 @@ export var outerWall = [
     y: 40,
   },
 ];
-export var margin = { top: 20, right: 20, bottom: 30, left: 30 },
+export var margin = { top: 20, right: 20, bottom: 20, left: 20 },
   width = 400 - margin.left - margin.right + 10,
   height = 350 - margin.top - margin.bottom;
 
