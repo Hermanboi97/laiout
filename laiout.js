@@ -51,8 +51,8 @@ function dragCorner(d, index) {
 
   if (index)
     outerWall[index] = {
-      x: Math.round(scaleX.invert(newPosition.x)),
-      y: Math.round(scaleY.invert(newPosition.y)),
+      x: scaleX.invert(newPosition.x),
+      y: scaleY.invert(newPosition.y),
     };
 
   // update room
