@@ -51,6 +51,8 @@ export function getPlacementCoordinates(
     // Find new remaining space
     remainingSpace = distanceBetweenPoints(point, wallEnd);
 
+    console.log(point, wallEnd, Math.round(remainingSpace));
+
     // Distance to offset our placement point from the wall
     var offsetDistance = furnitureHeight / 2;
 
